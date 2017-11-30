@@ -10,5 +10,5 @@ __email__ = 'mail@jnphilipp.org'
 __app_name__ = 'computer'
 __version_info__ = (0, 1, 0)
 __version__ = '.'.join(str(e) for e in __version_info__)
-__description__ = 'computer is a conversational system and intelligent ' +
+__description__ = 'computer is a conversational system and intelligent ' + \
                   'personal assistant.'
