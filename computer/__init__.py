@@ -12,3 +12,6 @@ __version_info__ = (0, 1, 0)
 __version__ = '.'.join(str(e) for e in __version_info__)
 __description__ = 'computer is a conversational system and intelligent ' + \
                   'personal assistant.'
+
+
+default_app_config = 'computer.apps.ComputerConfig'

@@ -1,0 +1,107 @@
+{% load admin_urls bootstrap i18n static computer %}
+{% get_current_language as LANGUAGE_CODE %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link rel="shortcut icon" href="{% static "images/favicon.png" %}"/>
+        {% bootstrap_css %}
+        {% bootstrap_js %}
+        <link rel="stylesheet" media="all" href="{% static "css/computer.css" %}"/>
+        <title>{% block title %}computer{% endblock %}</title>
+        {% block extrahead %}{% endblock %}
+        <script type="text/javascript">
+            function updateTime() {
+                var time = new Date();
+                var hours = time.getUTCHours();
+                var minutes = time.getUTCMinutes();
+                var seconds = time.getUTCSeconds();
+                $(".time").html((hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+            }
+
+            $(document).ready(function() {
+                setInterval("updateTime()", 1000);
+            });
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+                        <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url "dashboard" %}">
+                        <img alt="Brand" src="{% static "images/favicon.png" %}" style="margin-top: -5px; height: 30px; display: inline-block;"/> computer
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="navbar-collapse" role="navbar">
+                    <ul class="nav navbar-nav">
+                        <li class="timestamp">
+                            <span class="glyphicon glyphicon-time"></span> {% timestamp "%A, %d. %B %Y" %}<br>
+                            <span class="time">{% timestamp "%X" %}</span>
+                        </li>
+                        {% if user.is_authenticated %}
+                        {% else %}
+                        {% endif %}
+                    </ul>
+
+                    {% if user.is_authenticated %}
+                        <ul class="nav navbar-nav navbar-right">
+                            {% url "profiles:index" as profiles_index_url %}
+                            <li class="dropdown{% if request.path|startswith:profiles_index_url %} active{% endif %}">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    <span class="glyphicon glyphicon-user"></span>
+                                    <b>{{ user.get_short_name }}</b>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    {% url "profiles:profile" as profiles_profile_url %}
+                                    <li{% if request.path|startswith:profiles_profile_url %} class="active"{% endif %}>
+                                        <a href="{{ profiles_profile_url }}">
+                                            <span class="glyphicon glyphicon-user"></span>
+                                            {% trans "Profile" %}
+                                            {% if request.path|startswith:profiles_profile_url %}<span class="sr-only">(current)</span>{% endif %}
+                                        </a>
+                                    </li>
+                                    {% if user.is_staff %}
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="{% url "admin:index" %}"><span class="glyphicon glyphicon-cog"></span> {% trans "Admin" %}</a></li>
+                                    {% endif %}
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="{% url "profiles:signout" %}"><span class="glyphicon glyphicon-log-out"></span> {% trans "Sign out" %}</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <div class="nav navbar-right" style="margin-right: 3px;">
+                            <a href="{% url "profiles:signin" %}" class="btn btn-primary navbar-btn" role="button"><span class="glyphicon glyphicon-log-in"></span> {% trans "Sign in" %}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <ol class="breadcrumb">
+                        {% block breadcrumbs %}{% endblock %}
+                    </ol>
+                    {% messages %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

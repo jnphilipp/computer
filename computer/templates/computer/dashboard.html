@@ -1,0 +1,38 @@
+{% extends "computer/base.html" %}
+{% load i18n computer %}
+
+
+{% block title %}Dashboard • computer{% endblock %}
+
+
+{% block breadcrumbs %}
+<li class="active">{% trans "Dashboard" %}</li>
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-3 col-sm-offset-4 frame">
+        <ul id="history"></ul>
+        <div>
+            <input id="input" class="msg-input" placeholder="Type a message"/>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#input").focus();
+    $("#input").keypress(function(e) {
+        if ( e.which == 13 ) {
+            e.preventDefault();
+            var text = $("#input").val();
+            $("#input").val("");
+            $("#history").append("<li><div class='msg msg-r'><div class='text text-r'><p>" + text + "</p></div></div></li>");
+
+
+            $.getJSON("/api/v1/nlu?text=" + text, function(data) {
+                $("#history").append("<li><div class='msg msg-l'><div class='text text-l'><p>" + data.reply + "</p></div></div></li>");
+            });
+        }
+    });
+</script>
+{% endblock %}

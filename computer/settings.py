@@ -42,6 +42,8 @@ EMAIL_SUBJECT_PREFIX = '[computer] '
 # Application definition
 
 INSTALLED_APPS = [
+    'computer',
+    'django_bootstrap3',
     'profiles',
     'django.contrib.admin',
     'django.contrib.auth',
