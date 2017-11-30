@@ -1,0 +1,29 @@
+{% extends "computer/base.html" %}
+{% load bootstrap i18n %}
+
+
+{% block title %}Profile • computer{% endblock %}
+
+
+{% block breadcrumbs %}
+<li><a href="{% url "dashboard" %}">{% trans "Dashboard" %}</a></li>
+<li class="active">{% trans "Profile" %}</li>
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1 class="panel-title">{% trans "Profile" %}</h1>
+            </div>
+            <div class="panel-body">
+                {% trans "Save" as save_trans %}
+                {% url "profiles:profile" as form_url %}
+                {% bootstrap_form form=form url=form_url glyphicon="glyphicon glyphicon-floppy-save" btn_title=save_trans %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock%}
