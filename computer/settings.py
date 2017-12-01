@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'computer',
     'countries',
     'django_bootstrap3',
+    'intents',
     'profiles',
     'texts',
     'django.contrib.admin',
