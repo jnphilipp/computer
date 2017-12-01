@@ -44,3 +44,38 @@ class Country(models.Model):
         ordering = ('code',)
         verbose_name = _('Country')
         verbose_name_plural = _('Countries')
+
+
+class Language(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    name = SingleLineTextField(
+        unique=True,
+        verbose_name=_('Name')
+    )
+    code = models.CharField(
+        max_length=3,
+        unique=True,
+        verbose_name=_('ISO code')
+    )
+    countries = models.ManyToManyField(
+        Country,
+        blank=True,
+        related_name='languages',
+        verbose_name=_('Countries')
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = _('Language')
+        verbose_name_plural = _('Languages')
