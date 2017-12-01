@@ -81,6 +81,7 @@
                         </ul>
                     {% else %}
                         <div class="nav navbar-right" style="margin-right: 3px;">
+                            <a href="{% url "profiles:signup" %}" class="btn btn-success navbar-btn" role="button"><span class="glyphicon glyphicon-expand"></span> {% trans "Sign up" %}</a>
                             <a href="{% url "profiles:signin" %}" class="btn btn-primary navbar-btn" role="button"><span class="glyphicon glyphicon-log-in"></span> {% trans "Sign in" %}</a>
                         </div>
                     {% endif %}
