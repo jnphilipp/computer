@@ -2,13 +2,13 @@
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, views
+from django.contrib.auth.forms import PasswordResetForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 from profiles.forms import (AuthenticationForm, PasswordChangeForm,
-                            PasswordResetForm, SetPasswordForm,
-                            UserCreationForm)
+                            SetPasswordForm, UserCreationForm)
 from profiles.models import Profile
 from computer.decorators import piwik
 
