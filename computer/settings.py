@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'computer',
     'django_bootstrap3',
     'profiles',
+    'texts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
