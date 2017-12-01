@@ -36,3 +36,27 @@ class Text(models.Model):
         unique_together = ('content', 'language')
         verbose_name = _('Text')
         verbose_name_plural = _('Texts')
+
+
+class Entity(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    name = SingleLineTextField(
+        unique=True,
+        verbose_name=_('Name')
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = _('Entity')
+        verbose_name_plural = _('Entities')
