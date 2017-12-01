@@ -28,6 +28,13 @@ class Text(models.Model):
         verbose_name=_('Language')
     )
 
+    def to_dict(self):
+        return {
+            'text': self.content,
+            'language': self.language.code,
+            'entities': [e.to_dict() for e in self.entities.all()]
+        }
+
     def __str__(self):
         return self.content
 
@@ -93,6 +100,14 @@ class TextEntity(models.Model):
     value = SingleLineTextField(
         verbose_name=_('Value')
     )
+
+    def to_dict(self):
+        return {
+            'start': self.start,
+            'end': self.end,
+            'value': self.value,
+            'entity': self.entity.name
+        }
 
     def __str__(self):
         return self.value
