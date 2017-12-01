@@ -20,7 +20,7 @@ class Intent(models.Model):
 
     name = SingleLineTextField(
         unique=True,
-        verbose_name=_('Content')
+        verbose_name=_('Name')
     )
 
     def __str__(self):
