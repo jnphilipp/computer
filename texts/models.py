@@ -60,3 +60,44 @@ class Entity(models.Model):
         ordering = ('name',)
         verbose_name = _('Entity')
         verbose_name_plural = _('Entities')
+
+
+class TextEntity(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    text = models.ForeignKey(
+        Text,
+        models.CASCADE,
+        related_name='entities',
+        verbose_name=_('Text')
+    )
+    entity = models.ForeignKey(
+        Entity,
+        models.CASCADE,
+        related_name='texts',
+        verbose_name=_('Entity')
+    )
+    start = models.PositiveIntegerField(
+        verbose_name=_('Start')
+    )
+    end = models.PositiveIntegerField(
+        verbose_name=_('End')
+    )
+    value = SingleLineTextField(
+        verbose_name=_('Value')
+    )
+
+    def __str__(self):
+        return self.value
+
+    class Meta:
+        ordering = ('text', 'start', 'end')
+        verbose_name = _('Text entity')
+        verbose_name_plural = _('Text entities')
