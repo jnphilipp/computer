@@ -21,6 +21,12 @@ class Text(models.Model):
     content = SingleLineTextField(
         verbose_name=_('Content')
     )
+    intent = models.ForeignKey(
+        'intents.Intent',
+        models.CASCADE,
+        related_name='texts',
+        verbose_name=_('Intent')
+    )
     language = models.ForeignKey(
         'countries.Language',
         models.CASCADE,

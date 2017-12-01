@@ -40,7 +40,7 @@ class EntityAdmin(admin.ModelAdmin):
 @admin.register(Text)
 class TextAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['content', 'language']}),
+        (None, {'fields': ['content', 'language', 'intent']}),
     ]
     formfield_overrides = {
         SingleLineTextField: {
@@ -48,7 +48,7 @@ class TextAdmin(admin.ModelAdmin):
         },
     }
     inlines = (TextEntityInline,)
-    list_display = ('content', 'language')
-    list_filter = ('language',)
+    list_display = ('content', 'language', 'intent')
+    list_filter = ('language', 'intent')
     search_fields = ('content', 'language__name', 'language__code')
     ordering = ('content',)
