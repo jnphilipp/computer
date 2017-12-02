@@ -38,6 +38,7 @@ class Text(models.Model):
         return {
             'text': self.content,
             'language': self.language.code,
+            'intent': self.intent.name,
             'entities': [e.to_dict() for e in self.entities.all()]
         }
 
