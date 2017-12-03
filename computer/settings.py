@@ -165,6 +165,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 PIWIK = {}
 
 
+# Keras models
+
+MODELS = {}
+
+
 # Load local settings
 
 try:
