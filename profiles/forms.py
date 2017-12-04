@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib.auth import forms as authforms, get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
@@ -33,7 +33,14 @@ class SetPasswordForm(authforms.SetPasswordForm):
 
 
 class UserChangeForm(authforms.UserChangeForm):
-    class Meta(authforms.UserCreationForm.Meta):
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].widget = forms.TextInput()
+        self.fields['last_name'].widget = forms.TextInput()
+        self.fields['password'].help_text = mark_safe(
+            self.fields['password'].help_text
+        )
+    class Meta(authforms.UserChangeForm.Meta):
         model = get_user_model()
         fields = ('email', 'password', 'first_name', 'last_name')
 

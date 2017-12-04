@@ -16,10 +16,10 @@ Including another URLconf
 """
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls import include, path
 from django.utils.translation import ugettext_lazy as _
-from django.views import static
 from django.views.generic.base import RedirectView
 
 from .. import views
@@ -29,16 +29,15 @@ admin.site.site_header = _('computer administration')
 
 
 urlpatterns = [
-    url(r'^$', views.dashboard, name='dashboard'),
+    path('', views.dashboard, name='dashboard'),
 
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('computer.urls.api', 'api')),
-    url(r'^profiles/', include('profiles.urls', 'profiles')),
+    path('admin/', admin.site.urls),
+    path('api/', include('computer.urls.api')),
+    path('profiles/', include('profiles.urls')),
 
-    url(r'^favicon\.ico$',
-        RedirectView.as_view(url='/static/images/favicon.png')),
+    path('favicon.ico', RedirectView.as_view(url='/static/images/icon.png')),
 ]
 
 if settings.DEBUG:
-    urlpatterns += [url(r'^media/(?P<path>.*)$', static.serve,
-                        {'document_root': settings.MEDIA_ROOT})]
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

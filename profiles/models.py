@@ -85,6 +85,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
+        models.CASCADE,
         related_name='profile',
         verbose_name=_('User')
     )
