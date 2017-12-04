@@ -30,3 +30,32 @@ class Intent(models.Model):
         ordering = ('name',)
         verbose_name = _('Intent')
         verbose_name_plural = _('Intents')
+
+
+class Answer(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    text = SingleLineTextField(
+        verbose_name=_('Text')
+    )
+    intent = models.ForeignKey(
+        Intent,
+        models.CASCADE,
+        related_name='answers',
+        verbose_name=_('Intent')
+    )
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ('text',)
+        verbose_name = _('Answer')
+        verbose_name_plural = _('Answers')
