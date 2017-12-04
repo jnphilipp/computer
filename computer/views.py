@@ -34,10 +34,14 @@ def nlu(request):
     else:
         return HttpResponseBadRequest('The parameter "text" was not given.')
 
+    from computer.keras_models import NLUModel
+    model = NLUModel()
+    intent, language = model.predict(text)
+
     data = {
         'certainty': 1.0,
         'response_date': timezone.now().strftime('%Y-%m-%dT%H:%M:%S:%f%z'),
-        'reply': 'Hallo'
+        'reply': '%s, %s' % (intent, language)
     }
 
     return HttpResponse(json.dumps(data), 'application/json')
