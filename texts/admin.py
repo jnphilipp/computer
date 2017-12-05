@@ -25,6 +25,12 @@ class TextEntityInline(admin.TabularInline):
 
 @admin.register(Entity)
 class EntityAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return Entity.objects.annotate(texts_count=Count('texts'))
+
+    def texts_count(self, inst):
+        return inst.texts_count
+
     fieldsets = [
         (None, {'fields': ['name']}),
     ]
@@ -33,9 +39,11 @@ class EntityAdmin(admin.ModelAdmin):
             'widget': TextInput(attrs={'autocomplete': 'off'})
         },
     }
-    list_display = ('name',)
-    search_fields = ('name',)
+    list_display = ('name', 'texts_count')
     ordering = ('name',)
+    search_fields = ('name',)
+    texts_count.admin_order_field = 'texts_count'
+    texts_count.short_description = _('Number of Texts')
 
 
 @admin.register(Text)
@@ -62,5 +70,5 @@ class TextAdmin(admin.ModelAdmin):
     inlines = (TextEntityInline,)
     list_display = ('content', 'language', 'intent', 'entities_count')
     list_filter = ('language', 'intent')
-    search_fields = ('content', 'language__name', 'language__code')
     ordering = ('content',)
+    search_fields = ('content', 'language__name', 'language__code')
