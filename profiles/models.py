@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -88,6 +89,10 @@ class Profile(models.Model):
         models.CASCADE,
         related_name='profile',
         verbose_name=_('User')
+    )
+    preferences = JSONField(
+        default={},
+        verbose_name=_('Preferences')
     )
 
     def __str__(self):

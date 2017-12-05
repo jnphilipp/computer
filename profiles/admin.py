@@ -36,11 +36,12 @@ class UserAdmin(auth_admin.UserAdmin):
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['user']}),
+        (None, {'fields': ['user', 'preferences']}),
     ]
     formfield_overrides = {
         SingleLineTextField: {
             'widget': TextInput(attrs={'autocomplete': 'off'})
         },
     }
+    list_display = ('user',)
     ordering = ('user',)
