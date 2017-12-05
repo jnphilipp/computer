@@ -3,3 +3,7 @@
 
 def base(language):
     return {}
+
+
+def feelings(language):
+    return {}
