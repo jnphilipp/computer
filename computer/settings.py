@@ -170,6 +170,11 @@ PIWIK = {}
 MODELS = {}
 
 
+# APIS
+
+APIS = {}
+
+
 # Load local settings
 
 try:

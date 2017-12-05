@@ -8,6 +8,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest,
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from intents.models import Answer
 
 
 @piwik('Dashboard • computer')
@@ -38,10 +39,26 @@ def nlu(request):
     model = NLUModel()
     intent, language = model.predict(text)
 
+    from intents import intents
+    fn = getattr(intents, intent[0])
+    answer_dict = fn(language=language[0])
+
+    answer = Answer.objects.filter(
+        intent__name=intent[0],
+        language__code=language[0]
+    ).order_by('?')[:1]
+    if answer.count() == 1:
+        answer = answer[0]
+    else:
+        answer = Answer.objects.filter(
+            intent__name='fallback',
+            language__code=language[0]
+        ).order_by('?')[:1][0]
+
     data = {
-        'certainty': 1.0,
+        'certainty': float(intent[1]),
         'response_date': timezone.now().strftime('%Y-%m-%dT%H:%M:%S:%f%z'),
-        'reply': '%s, %s' % (intent, language)
+        'reply': answer.text % answer_dict
     }
 
     return HttpResponse(json.dumps(data), 'application/json')
