@@ -6,7 +6,7 @@ from django.forms import TextInput
 from django.utils.translation import ugettext_lazy as _
 
 from .forms import UserCreationForm
-from .models import Profile, SingleLineTextField, User
+from .models import NLURequest, Profile, SingleLineTextField, User
 
 
 @admin.register(User)
@@ -45,3 +45,21 @@ class ProfileAdmin(admin.ModelAdmin):
     }
     list_display = ('user',)
     ordering = ('user',)
+
+
+@admin.register(NLURequest)
+class NLURequestAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['user', 'params', 'nlu_model_output', 'answer']}),
+    ]
+    formfield_overrides = {
+        SingleLineTextField: {
+            'widget': TextInput(attrs={'autocomplete': 'off'})
+        },
+    }
+    list_display = ('user', 'params', 'nlu_model_output', 'answer',
+                    'updated_at')
+    list_filter = ('user', 'updated_at')
+    ordering = ('user', '-updated_at')
+    readonly_fields = ('user', 'params', 'nlu_model_output', 'answer',
+                    'updated_at')

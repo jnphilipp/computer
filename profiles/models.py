@@ -102,3 +102,41 @@ class Profile(models.Model):
         ordering = ('user',)
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
+
+
+class NLURequest(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        models.CASCADE,
+        related_name='nlu_requests',
+        verbose_name=_('User')
+    )
+    params = JSONField(
+        default={},
+        verbose_name=_('Request parameters')
+    )
+    nlu_model_output = JSONField(
+        default={},
+        verbose_name=_('NLU model output')
+    )
+    answer = SingleLineTextField(
+        verbose_name=_('Answer')
+    )
+
+    def __str__(self):
+        return '%s - %s' % (self.user.get_short_name(), self.updated_at)
+
+    class Meta:
+        ordering = ('user', '-updated_at')
+        verbose_name = _('NLU request')
+        verbose_name_plural = _('NLU requests')
+

@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from intents.models import Answer
+from profiles.models import NLURequest
 
 
 @piwik('Dashboard • computer')
@@ -29,6 +30,8 @@ def nlu(request):
     if 'application/json' == request.META.get('CONTENT_TYPE'):
         params.update(json.loads(request.body.decode('utf-8')))
     found_params = params.dict()
+    nlu_request = NLURequest.objects.create(user=request.user,
+                                            params=params.dict())
 
     if 'text' in params:
         text = params.pop('text')[0].lower()
@@ -38,6 +41,11 @@ def nlu(request):
     from computer.keras_models import NLUModel
     model = NLUModel()
     intent, language = model.predict(text)
+    nlu_request.nlu_model_output = {
+        'intent': [intent[0], float(intent[1])],
+        'language': [language[0], float(language[1])],
+    }
+    nlu_request.save()
 
     from intents import intents
     fn = getattr(intents, intent[0])
@@ -55,10 +63,11 @@ def nlu(request):
             language__code=language[0]
         ).order_by('?')[:1][0]
 
+    nlu_request.answer = answer.text % answer_dict
+    nlu_request.save()
     data = {
         'certainty': float(intent[1]),
         'response_date': timezone.now().strftime('%Y-%m-%dT%H:%M:%S:%f%z'),
         'reply': answer.text % answer_dict
     }
-
     return HttpResponse(json.dumps(data), 'application/json')
