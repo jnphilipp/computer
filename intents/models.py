@@ -45,6 +45,12 @@ class Answer(models.Model):
     text = SingleLineTextField(
         verbose_name=_('Text')
     )
+    language = models.ForeignKey(
+        'countries.Language',
+        models.CASCADE,
+        related_name='answers',
+        verbose_name=_('Language')
+    )
     intent = models.ForeignKey(
         Intent,
         models.CASCADE,
@@ -57,5 +63,6 @@ class Answer(models.Model):
 
     class Meta:
         ordering = ('text',)
+        unique_together = ('text', 'language', 'intent')
         verbose_name = _('Answer')
         verbose_name_plural = _('Answers')
