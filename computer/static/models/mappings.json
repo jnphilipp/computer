@@ -1,1 +1,1 @@
-[["time_general", "weather_general", "greet"], ["en", "de"]]
+{"outputs": [["time_general", "greet", "greet_feelings", "weather_general"], ["en", "de"]], "vocab": "/^? abcdefghijklmnopqrstuvwxyz\u00e4\u00f6\u00fc\u00df0123456789"}
