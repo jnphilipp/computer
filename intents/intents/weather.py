@@ -28,7 +28,7 @@ def general(language):
 
     temp_max = None
     temp_min = None
-    descriptions = {}
+    counts = {}
     for data in _api_call(settings.APIS['WEATHER']['GENRAL_ENDPOINT'],
                           params)['list']:
         if day.date() == datetime.utcfromtimestamp(data['dt']).date():
@@ -42,9 +42,15 @@ def general(language):
             else:
                 temp_min = data['main']['temp_min']
 
-            if data['weather'][0]['description'] not in descriptions:
-                descriptions[data['weather'][0]['description']] = 0
-            descriptions[data['weather'][0]['description']] += 1
+            for condition in data['weather']:
+                _id = condition['id']
+                if _id not in counts:
+                    counts[_id] = 0
+                counts[_id] += 1
 
-    weather = sorted(descriptions.items(), key=lambda i: (i[1], i[0]))[0][0]
-    return {'temp_min': temp_min, 'temp_max': temp_max, 'weather': weather}
+    weather = sorted(counts.items(), key=lambda i: (i[1], i[0]))[0][0]
+    return {
+        'temp_min': temp_min,
+        'temp_max': temp_max,
+        'weather': weather
+    }

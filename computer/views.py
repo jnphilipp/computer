@@ -8,7 +8,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest,
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from intents.models import Answer
+from intents.models import Answer, Attribute
 from profiles.models import NLURequest
 
 
@@ -51,12 +51,23 @@ def nlu(request):
 
     from intents import intents
     fn = getattr(intents, intent[0])
-    answer_dict = fn(language=language[0])
+    properties = fn(language=language[0])
+
+    required_attributes = []
+    for k, v in properties.items():
+        attributes = Attribute.objects.filter(key=k)
+        if attributes.count() > 1:
+            required_attributes.append(attributes.filter(value=v)[0].pk)
+        elif attributes.count() == 1:
+            required_attributes.append(attributes[0].pk)
 
     answer = Answer.objects.filter(
         intent__name=intent[0],
         language__code=language[0]
-    ).order_by('?')[:1]
+    )
+    for required_attribute in required_attributes:
+        answer = answer.filter(required_attributes__id=required_attribute)
+    answer = answer.order_by('?')[:1]
     if answer.count() == 1:
         answer = answer[0]
     else:
@@ -65,11 +76,11 @@ def nlu(request):
             language__code=language[0]
         ).order_by('?')[:1][0]
 
-    nlu_request.answer = answer.text % answer_dict
+    nlu_request.answer = answer.text % properties
     nlu_request.save()
     data = {
         'certainty': float(intent[1]),
         'response_date': timezone.now().strftime('%Y-%m-%dT%H:%M:%S:%f%z'),
-        'reply': answer.text % answer_dict
+        'reply': answer.text % properties
     }
     return HttpResponse(json.dumps(data), 'application/json')
