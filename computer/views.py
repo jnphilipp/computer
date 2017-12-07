@@ -30,8 +30,10 @@ def nlu(request):
     if 'application/json' == request.META.get('CONTENT_TYPE'):
         params.update(json.loads(request.body.decode('utf-8')))
     found_params = params.dict()
-    nlu_request = NLURequest.objects.create(user=request.user,
-                                            params=params.dict())
+    nlu_request = NLURequest.objects.create(
+        user=request.user if request.user.is_authenticated else None,
+        params=params.dict()
+    )
 
     if 'text' in params:
         text = params.pop('text')[0].lower()

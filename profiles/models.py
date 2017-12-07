@@ -117,6 +117,8 @@ class NLURequest(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         models.CASCADE,
+        blank=True,
+        null=True,
         related_name='nlu_requests',
         verbose_name=_('User')
     )
