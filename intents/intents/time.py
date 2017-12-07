@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
-from django.utils import timezone
-from django.utils.formats import get_format
+from django.utils import formats, timezone
 
 
 def general(language):
     time = timezone.localtime()
-    return {'time': time.strftime(get_format('DATE_FORMAT'))}
+    return {'time': formats.time_format(time, 'TIME_FORMAT')}

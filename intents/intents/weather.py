@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 from django.conf import settings
-from django.utils import timezone
+from django.utils import timezone, formats
 from utils.parser import BaseParser
 
 
@@ -50,7 +50,7 @@ def general(language):
 
     weather = sorted(counts.items(), key=lambda i: (i[1], i[0]))[0][0]
     return {
-        'temp_min': temp_min,
-        'temp_max': temp_max,
+        'temp_min': formats.number_format(temp_min, decimal_pos=1),
+        'temp_max': formats.number_format(temp_max, decimal_pos=1),
         'weather': weather
     }

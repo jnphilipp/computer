@@ -47,7 +47,6 @@ def nlu(request):
     translation.activate(language[0])
     request.LANGUAGE_CODE = translation.get_language()
 
-    intent = ('date_general', intent[1])
     nlu_request.nlu_model_output = {
         'intent': [intent[0], float(intent[1])],
         'language': [language[0], float(language[1])],
