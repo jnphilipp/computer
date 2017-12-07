@@ -12,8 +12,11 @@ from .models import Answer, Attribute, Intent, SingleLineTextField
 class AnswerInline(admin.TabularInline):
     extra = 1
     fieldsets = [
-        (None, {'fields': ['text', 'language', 'intent']}),
+        (None, {
+            'fields':['text', 'language', 'intent', 'required_attributes']
+        }),
     ]
+    filter_horizontal = ('required_attributes',)
     formfield_overrides = {
         SingleLineTextField: {
             'widget': TextInput(attrs={
