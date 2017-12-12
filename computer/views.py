@@ -8,7 +8,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest,
 from django.shortcuts import render
 from django.utils import timezone, translation
 from django.views.decorators.csrf import csrf_exempt
-from intents.models import Answer, Attribute
+from texts.models import Answer, Attribute
 from profiles.models import NLURequest
 
 
@@ -56,27 +56,29 @@ def nlu(request):
     from intents import intents
     fn = getattr(intents, intent[0])
     properties = fn(language=language[0])
+    nlu_request.intent_output = properties
+    nlu_request.save()
 
-    required_attributes = []
+    attributes = []
     for k, v in properties.items():
-        attributes = Attribute.objects.filter(key=k)
-        if attributes.count() > 1:
-            required_attributes.append(attributes.filter(value=v)[0].pk)
-        elif attributes.count() == 1:
-            required_attributes.append(attributes[0].pk)
+        attrs = Attribute.objects.filter(key=k)
+        if attrs.count() > 1:
+            attributes.append(attrs.filter(value=v)[0].pk)
+        elif attrs.count() == 1:
+            attributes.append(attrs[0].pk)
 
     answer = Answer.objects.filter(
-        intent__name=intent[0],
+        intents__name=intent[0],
         language__code=language[0]
     )
-    for required_attribute in required_attributes:
-        answer = answer.filter(required_attributes__id=required_attribute)
+    for attribute in attributes:
+        answer = answer.filter(attributes__id=attribute)
     answer = answer.order_by('?')[:1]
     if answer.count() == 1:
         answer = answer[0]
     else:
         answer = Answer.objects.filter(
-            intent__name='fallback',
+            intents__name='fallback',
             language__code=language[0]
         ).order_by('?')[:1][0]
 
