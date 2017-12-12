@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from computer.fields import SingleLineTextField
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.postgres.fields import JSONField
@@ -7,10 +8,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from profiles.user_manager import UserManager
-
-
-class SingleLineTextField(models.TextField):
-    pass
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -129,6 +126,10 @@ class NLURequest(models.Model):
     nlu_model_output = JSONField(
         default={},
         verbose_name=_('NLU model output')
+    )
+    intent_output = JSONField(
+        default={},
+        verbose_name=_('Intent output')
     )
     answer = SingleLineTextField(
         verbose_name=_('Answer')

@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, views
 from django.contrib.auth.forms import PasswordResetForm
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from profiles.forms import (AuthenticationForm, PasswordChangeForm,
                             SetPasswordForm, UserCreationForm)
@@ -55,7 +55,7 @@ def signup(request):
             new_user = authenticate(username=form.cleaned_data['username'],
                                     password=form.cleaned_data['password1'])
             login(request, new_user)
-            return redirect('profile')
+            return redirect('profiles:profile')
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', locals())

@@ -3,8 +3,8 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import computer.fields
 import django.utils.timezone
-import profiles.models
 
 
 class Migration(migrations.Migration):
@@ -26,8 +26,8 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated at')),
                 ('email', models.EmailField(max_length=254, unique=True, verbose_name='Email')),
-                ('first_name', profiles.models.SingleLineTextField(blank=True, null=True, verbose_name='First name')),
-                ('last_name', profiles.models.SingleLineTextField(blank=True, null=True, verbose_name='Last name')),
+                ('first_name', computer.fields.SingleLineTextField(blank=True, null=True, verbose_name='First name')),
+                ('last_name', computer.fields.SingleLineTextField(blank=True, null=True, verbose_name='Last name')),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Date joined')),
                 ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this site.', verbose_name='Staff status')),
                 ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='Active')),

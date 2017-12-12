@@ -40,6 +40,7 @@ class UserChangeForm(authforms.UserChangeForm):
         self.fields['password'].help_text = mark_safe(
             self.fields['password'].help_text
         )
+
     class Meta(authforms.UserChangeForm.Meta):
         model = get_user_model()
         fields = ('email', 'password', 'first_name', 'last_name')
