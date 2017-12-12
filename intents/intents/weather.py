@@ -48,7 +48,8 @@ def general(language):
                     counts[_id] = 0
                 counts[_id] += 1
 
-    weather = sorted(counts.items(), key=lambda i: (i[1], i[0]))[0][0]
+    weather = sorted(counts.items(), key=lambda i: (i[1], i[0]),
+                     reverse=True)[0][0]
     return {
         'temp_min': formats.number_format(temp_min, decimal_pos=1),
         'temp_max': formats.number_format(temp_max, decimal_pos=1),
