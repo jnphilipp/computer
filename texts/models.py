@@ -1,55 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from computer.fields import SingleLineTextField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-
-class SingleLineTextField(models.TextField):
-    pass
-
-
-class Text(models.Model):
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('Created at')
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name=_('Updated at')
-    )
-
-    content = SingleLineTextField(
-        verbose_name=_('Content')
-    )
-    intent = models.ForeignKey(
-        'intents.Intent',
-        models.CASCADE,
-        related_name='texts',
-        verbose_name=_('Intent')
-    )
-    language = models.ForeignKey(
-        'countries.Language',
-        models.CASCADE,
-        related_name='texts',
-        verbose_name=_('Language')
-    )
-
-    def to_dict(self):
-        return {
-            'text': self.content,
-            'language': self.language.code,
-            'intent': self.intent.name,
-            'entities': [e.to_dict() for e in self.entities.all()]
-        }
-
-    def __str__(self):
-        return self.content
-
-    class Meta:
-        ordering = ('language',)
-        unique_together = ('content', 'language')
-        verbose_name = _('Text')
-        verbose_name_plural = _('Texts')
 
 
 class Entity(models.Model):
@@ -76,7 +29,7 @@ class Entity(models.Model):
         verbose_name_plural = _('Entities')
 
 
-class TextEntity(models.Model):
+class Trigger(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_('Created at')
@@ -86,16 +39,60 @@ class TextEntity(models.Model):
         verbose_name=_('Updated at')
     )
 
-    text = models.ForeignKey(
-        Text,
+    text = SingleLineTextField(
+        verbose_name=_('Text')
+    )
+    intent = models.ForeignKey(
+        'intents.Intent',
+        models.CASCADE,
+        related_name='texts',
+        verbose_name=_('Intent')
+    )
+    language = models.ForeignKey(
+        'countries.Language',
+        models.CASCADE,
+        related_name='texts',
+        verbose_name=_('Language')
+    )
+
+    def to_dict(self):
+        return {
+            'text': self.text,
+            'language': self.language.code,
+            'intent': self.intent.name,
+            'entities': [e.to_dict() for e in self.entities.all()]
+        }
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ('language',)
+        unique_together = ('text', 'language')
+        verbose_name = _('Trigger')
+        verbose_name_plural = _('Triggers')
+
+
+class TriggerEntity(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    trigger = models.ForeignKey(
+        Trigger,
         models.CASCADE,
         related_name='entities',
-        verbose_name=_('Text')
+        verbose_name=_('Trigger')
     )
     entity = models.ForeignKey(
         Entity,
         models.CASCADE,
-        related_name='texts',
+        related_name='triggers',
         verbose_name=_('Entity')
     )
     start = models.PositiveIntegerField(
@@ -120,6 +117,71 @@ class TextEntity(models.Model):
         return self.value
 
     class Meta:
-        ordering = ('text', 'start', 'end')
-        verbose_name = _('Text entity')
-        verbose_name_plural = _('Text entities')
+        ordering = ('trigger', 'start', 'end')
+        verbose_name = _('Trigger entity')
+        verbose_name_plural = _('Trigger entities')
+
+
+class Attribute(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    key = SingleLineTextField(
+        verbose_name=_('Key')
+    )
+    value = SingleLineTextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Value')
+    )
+
+    def __str__(self):
+        return ('%s: %s' % (self.key, self.value)) if self.value else self.key
+
+    class Meta:
+        ordering = ('key', 'value')
+        unique_together = ('key', 'value')
+        verbose_name = _('Attribute')
+        verbose_name_plural = _('Attributes')
+
+
+class Answer(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    text = SingleLineTextField(
+        verbose_name=_('Text')
+    )
+    language = models.ForeignKey(
+        'countries.Language',
+        models.CASCADE,
+        related_name='answers',
+        verbose_name=_('Language')
+    )
+    attributes = models.ManyToManyField(
+        Attribute,
+        blank=True,
+        related_name='answers',
+        verbose_name=_('Attributes')
+    )
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ('language',)
+        unique_together = ('text', 'language')
+        verbose_name = _('Answer')
+        verbose_name_plural = _('Answers')
