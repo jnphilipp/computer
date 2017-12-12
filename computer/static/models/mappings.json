@@ -1,1 +1,1 @@
-{"outputs": [["greet_feelings", "weather_general", "greet", "time_general", "date_general", "weather_temp"], ["en", "de"]], "vocab": "/^? abcdefghijklmnopqrstuvwxyz\u00e4\u00f6\u00fc\u00df0123456789"}
+{"outputs": [["time_general", "weather_general", "date_general", "greet_feelings", "weather_temp", "greet", "thankyou", "affirm", "deny"], ["en", "de"]], "vocab": "/^? abcdefghijklmnopqrstuvwxyz\u00e4\u00f6\u00fc\u00df0123456789"}
