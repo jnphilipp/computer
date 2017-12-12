@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from computer.fields import SingleLineTextField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-
-class SingleLineTextField(models.TextField):
-    pass
 
 
 class Country(models.Model):
