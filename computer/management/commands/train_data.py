@@ -3,7 +3,7 @@
 import json
 
 from django.core.management.base import BaseCommand
-from texts.models import Text
+from texts.models import Trigger
 
 
 class Command(BaseCommand):
@@ -14,8 +14,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         common_examples = []
-        for text in Text.objects.all():
-            common_examples.append(text.to_dict())
+        for trigger in Trigger.objects.all():
+            common_examples.append(trigger.to_dict())
 
         regex_features = []
         entity_synonyms = []
