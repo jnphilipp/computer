@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import json
+import numpy as np
 
 from computer.decorators import piwik
+from django.db.models import Count
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseNotFound)
 from django.shortcuts import render
@@ -29,7 +31,6 @@ def nlu(request):
         else request.GET.copy()
     if 'application/json' == request.META.get('CONTENT_TYPE'):
         params.update(json.loads(request.body.decode('utf-8')))
-    found_params = params.dict()
     nlu_request = NLURequest.objects.create(
         user=request.user if request.user.is_authenticated else None,
         params=params.dict()
@@ -42,20 +43,17 @@ def nlu(request):
 
     from computer.keras_models import NLUModel
     model = NLUModel()
-    intent, language = model.predict(text)
+    outs = model.predict(text)
 
-    translation.activate(language[0])
+    translation.activate(outs['language']['name'])
     request.LANGUAGE_CODE = translation.get_language()
 
-    nlu_request.nlu_model_output = {
-        'intent': [intent[0], float(intent[1])],
-        'language': [language[0], float(language[1])],
-    }
+    nlu_request.nlu_model_output = outs
     nlu_request.save()
 
     from intents import intents
-    fn = getattr(intents, intent[0])
-    properties = fn(language=language[0])
+    fn = getattr(intents, outs['intent']['name'])
+    properties = fn(text=text, language=outs['language']['name'], **outs['entities'])
     nlu_request.intent_output = properties
     nlu_request.save()
 
@@ -63,19 +61,23 @@ def nlu(request):
     for k, v in properties.items():
         attrs = Attribute.objects.filter(key=k)
         if attrs.count() > 1:
-            attributes.append(attrs.filter(value=v)[0].pk)
+            if attrs.filter(value=v).exists():
+                attributes.append(attrs.filter(value=v)[0].pk)
+            else:
+                attributes.append(attrs.filter(value=None)[0].pk)
         elif attrs.count() == 1:
             attributes.append(attrs[0].pk)
 
-    answer = Answer.objects.filter(
-        intents__name=intent[0],
-        language__code=language[0]
+    answer = Answer.objects.annotate(num_attrs=Count('attributes')).filter(
+        intents__name=outs['intent']['name'],
+        language__code=outs['language']['name'],
+        num_attrs=len(attributes)
     )
     for attribute in attributes:
         answer = answer.filter(attributes__id=attribute)
-    answer = answer.order_by('?')[:1]
-    if answer.count() == 1:
-        answer = answer[0]
+
+    if answer.count() >= 1:
+        answer = np.random.choice(answer)
     else:
         answer = Answer.objects.filter(
             intents__name='fallback',
@@ -85,8 +87,9 @@ def nlu(request):
     nlu_request.answer = answer.text % properties
     nlu_request.save()
     data = {
-        'certainty': float(intent[1]),
         'response_date': timezone.now().strftime('%Y-%m-%dT%H:%M:%S:%f%z'),
+        'intent': outs['intent']['name'],
+        'certainty': outs['intent']['p'],
         'reply': answer.text % properties
     }
     return HttpResponse(json.dumps(data), 'application/json')

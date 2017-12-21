@@ -4,6 +4,6 @@ from django.conf import settings
 from django.utils import formats, timezone
 
 
-def general(language):
+def general(text, language, **kwargs):
     time = timezone.localtime()
     return {'time': formats.time_format(time, 'TIME_FORMAT')}

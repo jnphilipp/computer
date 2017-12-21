@@ -18,7 +18,7 @@ def _api_call(endpoint, params={}):
     return parser.fetch(url)
 
 
-def general(language):
+def general(text, language, **kwargs):
     day = timezone.now() + timedelta(days=1)
     params = {
         'lang': language,
