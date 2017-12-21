@@ -51,8 +51,18 @@ class NLUModel(metaclass=Singleton):
         X = np.asarray([int(s.translate(self.trans)) for s in '%s^' % text]). \
             reshape((1, len(text) + 1))
         outs = self.model.predict(X, batch_size=1)
-        p = []
+        p = {'entities': {}}
         for i in range(len(outs)):
             out = outs[i][0].argmax()
-            p.append((self.mappings['outputs'][i][out], outs[i][0][out]))
+
+            name = self.mappings['outputs']['outputs'][i]
+            if name in self.mappings['outputs']:
+                p[name] = {
+                    'name': self.mappings['outputs'][name][out],
+                    'p': float(outs[i][0][out])
+                }
+            elif name in self.mappings['outputs']['entities']:
+                p['entities']['name'] = float(outs[i][0][out])
+            else:
+                p[name] = float(outs[i][0][out])
         return p
