@@ -20,6 +20,10 @@
     </div>
 </div>
 <script type="text/javascript">
+    var latitude = undefined;
+    var longitude = undefined;
+    var last_intent = undefined;
+
     $("#input").focus();
     $("#input").keypress(function(e) {
         if ( e.which == 13 ) {
@@ -28,11 +32,52 @@
             $("#input").val("");
             $("#history").append("<li><div class='msg msg-r'><div class='text text-r'><p>" + text + "</p></div></div></li>");
 
+            var data = {"text": text};
+            if ( latitude !== undefined && longitude !== undefined ) {
+                data.latitude = latitude;
+                data.longitude = longitude;
+            }
+            if ( last_intent !== undefined )
+                data.last_intent = last_intent;
 
-            $.getJSON("/api/v1/nlu?text=" + text, function(data) {
+            $.getJSON("/api/v1/nlu/", data, function(data) {
                 $("#history").append("<li><div class='msg msg-l'><div class='text text-l'><p>" + data.reply + "</p></div></div></li>");
+                last_intent = data.intent;
             });
         }
     });
+
+    $(window).on("load", function() {
+        if (navigator.geolocation)
+            navigator.geolocation.watchPosition(showPosition, showError);
+        else
+            console.log("{% trans "Geolocation is not supported by this browser." %}");
+    });
+
+    function showPosition(position) {
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+    }
+
+    function showError(error) {
+        latitude = undefined;
+        longitude = undefined;
+
+        switch ( error.code ) {
+            case error.PERMISSION_DENIED:
+                console.log("{% trans "User denied the request for Geolocation." %}");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("{% trans "Location information is unavailable." %}");
+                break;
+            case error.TIMEOUT:
+                console.log("{% trans "The request to get user location timed out." %}");
+                break;
+            case error.UNKNOWN_ERROR:
+                console.log("{% trans "An unknown error occurred." %}");
+                break;
+        }
+    }
+</script>
 </script>
 {% endblock %}
