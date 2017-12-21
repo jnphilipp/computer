@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
+from django.db.models import F
 from django.forms import TextInput
 from django.utils.translation import ugettext_lazy as _
 
@@ -39,13 +40,21 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(NLURequest)
 class NLURequestAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return NLURequest.objects.annotate(response_time=F('updated_at') - F('created_at'))
+
+    def show_response_time(self, inst):
+        return inst.response_time
+
     fieldsets = [
         (None, {'fields': ['user', 'params', 'nlu_model_output',
                            'intent_output', 'answer']}),
     ]
     list_display = ('user', 'params', 'nlu_model_output', 'intent_output',
-                    'answer', 'updated_at')
+                    'answer', 'show_response_time')
     list_filter = ('user', 'updated_at')
-    ordering = ('user', '-updated_at')
+    ordering = ('-updated_at',)
     readonly_fields = ('user', 'params', 'nlu_model_output', 'intent_output',
                        'answer', 'updated_at')
+    show_response_time.admin_order_field = 'response_time'
+    show_response_time.short_description = _('Response time')
