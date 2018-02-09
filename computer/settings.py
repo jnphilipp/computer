@@ -44,7 +44,7 @@ EMAIL_SUBJECT_PREFIX = '[computer] '
 INSTALLED_APPS = [
     'computer',
     'countries',
-    'django_bootstrap3',
+    'django_bootstrap4',
     'intents',
     'profiles',
     'texts',

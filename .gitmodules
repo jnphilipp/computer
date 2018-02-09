@@ -1,3 +1,6 @@
 [submodule "utils"]
 	path = utils
 	url = https://github.com/jnphilipp/python-utils
+[submodule "django_bootstrap4"]
+	path = django_bootstrap4
+	url = git@github.com:jnphilipp/django_bootstrap4.git
