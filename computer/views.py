@@ -90,6 +90,6 @@ def nlu(request):
         'response_date': timezone.now().strftime('%Y-%m-%dT%H:%M:%S:%f%z'),
         'intent': outs['intent']['name'],
         'certainty': outs['intent']['p'],
-        'reply': answer.text % properties
+        'replies': [answer.text % properties]
     }
     return HttpResponse(json.dumps(data), 'application/json')

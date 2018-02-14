@@ -5,14 +5,16 @@ body {
     padding-top: 70px;
 }
 
-p { text-align: justify; }
+p {
+    text-align: justify;
+}
 
 
 /*### timestamp ###*/
 
 .timestamp {
     border-left: 1px solid #eee;
-    color: black;
+    color: gray;
     font-size: 8pt;
     height: 50px;
     padding-left: 5px;
@@ -29,102 +31,11 @@ p { text-align: justify; }
 /*### chat ###*/
 
 .frame {
-    background: white;
-    height: 600px;
-    overflow: hidden;
-    padding: 0;
-    border: 1px solid silver;
-    border-radius: 5px;
+    max-height: 600px;
+    overflow-y: scroll;
 }
-.frame > div:last-of-type {
-    position: absolute;
-    bottom: 5px;
-    width: 100%;
-    display: flex;
-}
-.frame > ul {
-    width:100%;
-    list-style-type: none;
-    padding:18px;
-    position:absolute;
-    bottom:32px;
-    display:flex;
-    flex-direction: column;
-}
-.frame > ul > li { width: 100%; }
-.msg-input {
-    background: #F0F0F0;
-    border: 0;
-    border-radius: 5px;
-    display: flex;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 5px;
-    padding: 15px;
-    width: 85%;
-    outline: none;
-}
-.msg-input::-webkit-input-placeholder { color: #d4d4d4; }
-.msg-input::-moz-placeholder {  color: #d4d4d4; }
-.msg-input:-ms-input-placeholder { color: #d4d4d4; }
-.msg-input:-moz-placeholder { color: #d4d4d4; }
-.text {
-    display: flex;
-    flex-direction: column;
-}
-.text > p:first-of-type {
-    width:100%;
-    margin-top: 0;
-    margin-bottom: auto;
-    line-height: 13px;
-    font-size: 12px;
-}
-.text > p:last-of-type {
-    width: 100%;
-    text-align: right;
-    margin-top: auto;
-}
-.text-l {
-    float: left;
-    padding-right: 10px;
-}
-.text-r{
-    float: right;
-    padding-left: 10px;
-}
-.msg {
-    margin-top: 5px;
-    border-radius: 5px;
-    padding: 5px;
-    display: flex;
-}
-.msg-l {
-    float: left;
-    background: lightgrey;
-}
-.msg-l:before {
-    width: 0;
-    height: 0;
-    content: "";
-    top: -5px;
-    left: -14px;
-    position: relative;
-    border-style: solid;
-    border-width: 0 13px 13px 0;
-    border-color: transparent lightgrey transparent transparent;
-}
-.msg-r {
-    float: right;
-    background: #F0F0F0;
-}
-.msg-r:after {
-    width: 0;
-    height: 0;
-    content:"";
-    top: -5px;
-    left: 14px;
-    position: relative;
-    border-style: solid;
-    border-width: 13px 13px 0 0;
-    border-color: #F0F0F0 transparent transparent transparent;
+
+.avatar {
+    max-width: 60px;
+    max-height: 60px;
 }
