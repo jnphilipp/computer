@@ -14,9 +14,9 @@ from texts.models import Answer, Attribute
 from profiles.models import NLURequest
 
 
-@piwik('Dashboard • computer')
-def dashboard(request):
-    return render(request, 'computer/dashboard.html', locals())
+@piwik('Chat • computer')
+def chat(request):
+    return render(request, 'computer/chat.html', locals())
 
 
 @csrf_exempt

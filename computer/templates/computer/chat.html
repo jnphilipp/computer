@@ -2,11 +2,8 @@
 {% load i18n computer static %}
 
 
-{% block title %}Dashboard • computer{% endblock %}
-
-
 {% block breadcrumbs %}
-<li class="breadcrumb-item active" aria-current="page">{% trans "Dashboard" %}</li>
+<li class="breadcrumb-item active" aria-current="page">{% trans "Chat" %}</li>
 {% endblock %}
 
 
@@ -17,7 +14,7 @@
             <div class="col-md-12">
                 <div id="history" class="list-group frame">
                     <div class="list-group-item flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
+                        <div class="d-flex w-100 justify-content-start">
                             <img class="rounded-circle avatar" src="{% static "images/icon.png" %}"/>
                             <p class="ml-md-1">{% trans "Hallo, wie kann ich behilflich sein?" %}</p>
                         </div>
@@ -43,7 +40,7 @@
             e.preventDefault();
             var text = $("#msg-input").val();
             $("#msg-input").val("");
-            $("#history").append("<div class=\"list-group-item flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-between\"><p class=\"mr-md-1\">" + text + "</p><img class=\"rounded-circle avatar\" src=\"{% gravatar 75 %}\"></div></div>");
+            $("#history").append("<div class=\"list-group-item flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-end\"><p class=\"mr-md-1\">" + text + "</p><img class=\"rounded-circle avatar\" src=\"{% gravatar 75 %}\"></div></div>");
             $("#history").scrollTop($("#history")[0].scrollHeight);
 
             var data = {"text": text};
@@ -57,7 +54,7 @@
             $.getJSON("/api/v1/nlu/", data, function(data) {
                 last_intent = data.intent;
                 data.replies.forEach(function(reply) {
-                    $("#history").append("<div class=\"list-group-item flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-between\"><img class=\"rounded-circle avatar\" src=\"{% static "images/icon.png" %}\"><p class=\"ml-md-1\">" + reply + "</p></div></div>");
+                    $("#history").append("<div class=\"list-group-item flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-start\"><img class=\"rounded-circle avatar\" src=\"{% static "images/icon.png" %}\"><p class=\"ml-md-1\">" + reply + "</p></div></div>");
                 });
                 $("#history").scrollTop($("#history")[0].scrollHeight);
             });
