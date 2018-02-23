@@ -6,5 +6,5 @@ from .. import views
 
 app_name = 'api'
 urlpatterns = [
-    path(r'v1/nlu/', views.nlu),
+    path('v1/nlu/', views.nlu),
 ]
