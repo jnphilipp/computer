@@ -29,7 +29,8 @@ admin.site.site_header = _('computer administration')
 
 
 urlpatterns = [
-    path('', views.chat, name='chat'),
+    path('', views.dashboard, name='dashboard'),
+    path('chat/', views.chat, name='chat'),
 
     path('admin/', admin.site.urls),
     path('api/', include('computer.urls.api')),

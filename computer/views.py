@@ -7,7 +7,7 @@ from computer.decorators import piwik
 from django.db.models import Count
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseNotFound)
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone, translation
 from django.views.decorators.csrf import csrf_exempt
 from texts.models import Answer, Attribute
@@ -17,6 +17,11 @@ from profiles.models import NLURequest
 @piwik('Chat • computer')
 def chat(request):
     return render(request, 'computer/chat.html', locals())
+
+
+@piwik('Dashboard • computer')
+def dashboard(request):
+    return redirect('chat')
 
 
 @csrf_exempt
