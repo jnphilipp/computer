@@ -27,8 +27,17 @@ class TriggerInline(admin.TabularInline):
 
 @admin.register(Intent)
 class IntentAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return Intent.objects.annotate(
+            answers_count=Count('answers', distinct=True),
+            triggers_count=Count('triggers', distinct=True)
+        )
+
     def answers_count(self, inst):
-        return inst.answers.count()
+        return inst.answers_count
+
+    def triggers_count(self, inst):
+        return inst.triggers_count
 
     answers_count.admin_order_field = 'answers_count'
     answers_count.short_description = _('Number of Answers')
@@ -45,6 +54,8 @@ class IntentAdmin(admin.ModelAdmin):
     }
     filter_horizontal = ('answers',)
     inlines = (TriggerInline,)
-    list_display = ('name', 'answers_count')
+    list_display = ('name', 'triggers_count', 'answers_count')
     ordering = ('name',)
     search_fields = ('name',)
+    triggers_count.admin_order_field = 'triggers_count'
+    triggers_count.short_description = _('Number of Triggers')

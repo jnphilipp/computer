@@ -13,8 +13,10 @@ from .models import Answer, Attribute, Entity, Trigger, TriggerEntity
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
-        return Answer.objects.annotate(attributes_count=Count('attributes'),
-                                       intents_count=Count('intents'))
+        return Answer.objects.annotate(
+            attributes_count=Count('attributes', distinct=True),
+            intents_count=Count('intents', distinct=True)
+        )
 
     def attributes_count(self, inst):
         return inst.attributes_count
@@ -83,9 +85,10 @@ class EntityAdmin(admin.ModelAdmin):
         return inst.triggers.count()
 
     fieldsets = [
-        (None, {'fields': ['name']}),
+        (None, {'fields': ['name', 'parent']}),
     ]
-    list_display = ('name', 'triggers_count')
+    list_display = ('name', 'parent', 'triggers_count')
+    list_filter = ('parent',)
     ordering = ('name',)
     search_fields = ('name',)
     triggers_count.admin_order_field = 'triggers_count'
