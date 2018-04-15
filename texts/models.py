@@ -19,6 +19,14 @@ class Entity(models.Model):
         unique=True,
         verbose_name=_('Name')
     )
+    parent = models.ForeignKey(
+        'Entity',
+        models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='children',
+        verbose_name=_('Parent')
+    )
 
     def __str__(self):
         return self.name
@@ -45,13 +53,13 @@ class Trigger(models.Model):
     intent = models.ForeignKey(
         'intents.Intent',
         models.CASCADE,
-        related_name='texts',
+        related_name='triggers',
         verbose_name=_('Intent')
     )
     language = models.ForeignKey(
         'countries.Language',
         models.CASCADE,
-        related_name='texts',
+        related_name='triggers',
         verbose_name=_('Language')
     )
 
@@ -110,7 +118,10 @@ class TriggerEntity(models.Model):
             'start': self.start,
             'end': self.end,
             'value': self.value,
-            'entity': self.entity.name
+            'entity': {
+                'name': self.entity.name,
+                'parent': self.entity.parent.name if self.entity.parent else None
+            }
         }
 
     def __str__(self):

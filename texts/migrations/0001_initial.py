@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated at')),
                 ('name', computer.fields.SingleLineTextField(unique=True, verbose_name='Name')),
+                ('parent', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.SET_NULL, related_name='children', to='texts.Entity', verbose_name='Parent'))
             ],
             options={
                 'verbose_name': 'Entity',

@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated at')),
                 ('text', computer.fields.SingleLineTextField(verbose_name='Text')),
-                ('intent', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='texts', to='intents.Intent', verbose_name='Intent')),
-                ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='texts', to='countries.Language', verbose_name='Language')),
+                ('intent', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='triggers', to='intents.Intent', verbose_name='Intent')),
+                ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='triggers', to='countries.Language', verbose_name='Language')),
             ],
             options={
                 'verbose_name': 'Trigger',
