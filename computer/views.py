@@ -6,7 +6,7 @@ import numpy as np
 from computer.decorators import piwik
 from django.db.models import Count
 from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseNotFound)
+                         HttpResponseNotAllowed, HttpResponseNotFound)
 from django.shortcuts import redirect, render
 from django.utils import timezone, translation
 from django.views.decorators.csrf import csrf_exempt
@@ -29,11 +29,13 @@ def dashboard(request):
 def nlu(request):
     """Handels GET/POST request for nlu.
 
-    GET/POST parameters:
+    POST parameters:
         text: the text to do the nlu for
     """
-    params = request.POST.copy() if request.method == 'POST' \
-        else request.GET.copy()
+    if request.method == 'GET':
+        return HttpResponseNotAllowed(['POST'])
+
+    params = request.POST.copy()
     if 'application/json' == request.META.get('CONTENT_TYPE'):
         params.update(json.loads(request.body.decode('utf-8')))
     nlu_request = NLURequest.objects.create(

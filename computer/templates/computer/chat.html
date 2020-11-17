@@ -50,11 +50,11 @@
             if ( last_intent !== undefined )
                 data.last_intent = last_intent;
 
-            $.getJSON("/api/v1/nlu/", data, function(data) {
+            $.post("/api/v1/nlu/", data, function(data) {
                 last_intent = data.intent;
                 data.replies.forEach(function(reply) {
                     $("#history").append("<div class=\"list-group-item flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-start\"><img class=\"rounded-circle avatar\" src=\"{% static "images/icon.png" %}\"><p class=\"ml-md-1\">" + reply + "</p></div></div>");
-                });
+                }, "json");
                 $("#history").scrollTop($("#history")[0].scrollHeight);
             });
         }
