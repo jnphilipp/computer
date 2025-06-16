@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block container %}
+<div class="row mt-md-5">
+    <div class="col-6 offset-3">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="history" class="list-group">
+
+                    <div class="list-group-item border-0 flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-start">
+                            <p class="balon-l">{% translate "Hallo, wie kann ich behilflich sein?" %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-md-1">
+            <div class="col-md-12 text-center">
+                <textarea id="msg-input" class="form-control" placeholder="{% translate "Type a message" %}" style="resize: none; min-height: 2em; overflow: hidden;"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var latitude = undefined;
+    var longitude = undefined;
+    var last_intent = undefined;
+
+    $("#msg-input").focus();
+    $("#msg-input").keypress(function(e) {
+        if ( e.which == 13 ) {
+            e.preventDefault();
+            var today = new Date();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            var text = $("#msg-input").val();
+            $("#msg-input").val("");
+            $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-end\"><p class=\"balon-r\">" + text + "</p></div></div>");
+            $("#history").scrollTop($("#history")[0].scrollHeight);
+
+            var data = {"text": text};
+            if ( latitude !== undefined && longitude !== undefined ) {
+                data.latitude = latitude;
+                data.longitude = longitude;
+            }
+            if ( last_intent !== undefined )
+                data.last_intent = last_intent;
+
+            $.post("/api/v1/nlu/", data, function(data) {
+                last_intent = data.intent;
+                data.replies.forEach(function(reply) {
+                    $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-start\"><p class=\"balon-l\">" + reply + "</p></div></div>");
+                }, "json");
+                $("#history").scrollTop($("#history")[0].scrollHeight);
+            });
+        }
+    });
+
+    $(window).on("load", function() {
+        if ( navigator.geolocation )
+            navigator.geolocation.watchPosition(showPosition, showError);
+        else
+            console.log("{% translate "Geolocation is not supported by this browser." %}");
+    });
+
+    function showPosition(position) {
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+    }
+
+    function showError(error) {
+        latitude = undefined;
+        longitude = undefined;
+
+        switch ( error.code ) {
+            case error.PERMISSION_DENIED:
+                console.log("{% translate "User denied the request for Geolocation." %}");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("{% translate "Location information is unavailable." %}");
+                break;
+            case error.TIMEOUT:
+                console.log("{% translate "The request to get user location timed out." %}");
+                break;
+            case error.UNKNOWN_ERROR:
+                console.log("{% translate "An unknown error occurred." %}");
+                break;
+        }
+    }
+</script>
+{% endblock %}

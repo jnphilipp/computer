@@ -1,0 +1,98 @@
+{% load django_html_utils i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link rel="shortcut icon" href="{% static "images/icon.png" %}"/>
+        {% django_html_utils_css %}
+        {% django_html_utils_js %}
+        <link rel="stylesheet" media="all" href="{% static "css/computer.css" %}"/>
+        <title>{% block title %}computer{% endblock %}</title>
+        {% block extrahead %}{% endblock %}
+    </head>
+    <body>
+        {% block navigation %}
+            <nav class="navbar fixed-top navbar-expand-lg bg-white">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{% url "chat" %}">
+                        <img alt="Brand" src="{% static "images/icon.png" %}" style="margin-top: -5px; height: 30px; display: inline-block;"/> computer
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent" role="navbar">
+                        <ul class="navbar-nav me-auto">
+                            {% if user.is_authenticated %}
+                            {% else %}
+                            {% endif %}
+                        </ul>
+
+                        {% if user.is_authenticated %}
+                            <ul class="navbar-nav">
+                                {% url "profiles:index" as profiles_index_url %}
+                                <li class="nav-item dropdown{% if request.path|startswith:profiles_index_url %} active{% endif %}">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {% if user.profile.avatar %}
+                                           <!--% avatar size=26 classes="image-rounded" % -->
+                                        {% else %}
+                                            <b>{{ user.get_short_name }}</b>
+                                        {% endif %}
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        {% url "profiles:profile" as profiles_profile_url %}
+                                        <li>
+                                            <a href="{{ profiles_profile_url }}" class="dropdown-item{% if request.path|startswith:profiles_profile_url %} active{% endif %}">
+                                                {% translate "Profile" %}
+                                                {% if request.path|startswith:profiles_profile_url %}<span class="sr-only">(current)</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        {% if user.is_staff %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="{% url "admin:index" %}">{% translate "Admin" %}</a>
+                                        {% endif %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form id="logout-form" method="post" action="{% url 'profiles:signout' %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">{% translate 'Sign out' %}</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        {% else %}
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a href="{% url "profiles:signin" %}?next={{ request.path }}" class="btn btn-outline-primary" role="button">{% translate "Sign in" %}</a>
+                                </li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+        {% endblock %}
+        <div class="container-fluid">
+            {% block container %}
+                <div class="row">
+                    <div class="col-md-10 offset-md-1">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                {% block breadcrumbs %}{% endblock %}
+                            </ol>
+                        </nav>
+                        {% messages %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
+            {% endblock %}
+        </div>
+    </body>
+</html>

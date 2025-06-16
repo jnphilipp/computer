@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load django_html_utils i18n static %}
+
+{% block extrahead %}{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="row">
+            <div class="col-4 offset-4 d-flex justify-content-center">
+                <p class="alert alert-danger">
+                    {% blocktranslate trimmed with username=request.user.username %}You are authenticated as {{ username }}, but are not authorized to access this page. Would you like to login to a different account?{% endblocktranslate %}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-4 offset-md-4 col-sm-6 offset-sm-3 d-flex justify-content-center">
+                <div class="card card-login mx-auto mt-5">
+                    <h4 class="card-header">{% translate "computer" %}</h4>
+                    <div class="card-body">
+                        {% if invalid %}
+                            <div class="alert alert-danger">{% translate "Invalid e-mail or password" %}</div>
+                        {% endif %}
+                        <form action="{% url 'profiles:signin' %}" method="post" id="login-form">
+                            {% csrf_token %}
+                            <div class="form-floating mb-3">
+                                <input type="text" id="inputUsername" name="username" class="form-control" autocomplete="email webauthn" autofocus="autofocus" placeholder="{% translate "E-mail" %}">
+                                <label for="inputUsername" class="form-label">{% translate "E-mail" %}:</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" id="inputPassword"  name="password" class="form-control" placeholder="{% translate "Password" %}">
+                                <label for="inputPassword" class="form-label">{% translate "Password" %}:</label>
+                            </div>
+                            <div class="mb-3 text-center">
+                                <input type="hidden" name="passkeys" id="passkeys">
+                                <input type="hidden" name="next" value="{{ next }}">
+                                <button class="btn btn-block btn-light" type="button" onclick="authn('login-form')">{% fa "key" %} {% translate "Login by passkey" %}</button>
+                                <button class="btn btn-primary btn-block" type="submit">{% fa "right-to-bracket" %} {% translate "Login" %}</button>
+                            </div>
+                            <div class="mb-3 text-center">
+                                <a href="{% url "profiles:password_reset" %}">{% translate "Password forgotten?" %}</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

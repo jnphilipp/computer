@@ -1,0 +1,13 @@
+{% load i18n static computer %}
+
+{% autoescape off %}
+{% blocktrans with name=user.get_short_name %}Hello {{ name }}{% endblocktrans %},
+
+{% block content %}{% endblock %}
+
+{% trans "The computer team." %}
+
+
+
+Copyright © {% timestamp "%Y" %} computer
+{% endautoescape %}

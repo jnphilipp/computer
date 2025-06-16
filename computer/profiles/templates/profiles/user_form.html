@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load django_html_utils i18n %}
+
+
+{% block title %}Profile • computer{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        {% translate "Save" as save_trans %}
+        {% url "profiles:profile" as form_url %}
+        {% form form=form url=form_url submit_title=save_trans %}
+    </div>
+</div>
+{% endblock%}
