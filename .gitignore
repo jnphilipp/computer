@@ -10,6 +10,9 @@ computer/db.sqlite3
 computer/media
 computer/static
 
+# Sacred
+experiments
+
 # SublimeText
 *.sublime-project
 *.sublime-workspace
