@@ -37,6 +37,13 @@ class Intent(models.Model):
         """Name."""
         return self.name
 
+    def to_dict(self) -> dict[str, str | list[dict]]:
+        """Convert this model to a dictionary."""
+        return {
+            "name": self.name,
+            "answers": [answer.to_dict() for answer in self.answers.all()],
+        }
+
     class Meta:
         """Meta."""
 

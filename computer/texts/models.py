@@ -43,6 +43,13 @@ class Entity(models.Model):
         """Name."""
         return self.name
 
+    def to_dict(self) -> dict[str, str | None | dict]:
+        """Convert this model to a dictionary."""
+        return {
+            "name": self.name,
+            "parent": None if self.parent is None else self.parent.to_dict(),
+        }
+
     class Meta:
         """Meta."""
 
@@ -68,12 +75,12 @@ class Trigger(models.Model):
         max_length=10, choices=settings.LANGUAGES, verbose_name=_("Language")
     )
 
-    def to_dict(self) -> dict[str, str | dict]:
+    def to_dict(self) -> dict[str, str | list[dict]]:
         """Convert this model to a dictionary."""
         return {
             "text": self.text,
             "language": self.language,
-            "intent": self.intent.name,
+            "intent": self.intent.to_dict(),
             "entities": [e.to_dict() for e in self.entities.all()],
         }
 
@@ -112,10 +119,7 @@ class TriggerEntity(models.Model):
             "start": self.start,
             "end": self.end,
             "value": self.value,
-            "entity": {
-                "name": self.entity.name,
-                "parent": self.entity.parent.name if self.entity.parent else None,
-            },
+            "entity": self.entity.to_dict(),
         }
 
     def __str__(self) -> str:
@@ -145,6 +149,13 @@ class Attribute(models.Model):
         """Name."""
         return f"{self.key}: {self.value}" if self.value else self.key
 
+    def to_dict(self) -> dict[str, str | None]:
+        """Convert this model to a dictionary."""
+        return {
+            "key": self.key,
+            "value": self.value,
+        }
+
     class Meta:
         """Meta."""
 
@@ -171,6 +182,14 @@ class Answer(models.Model):
     def __str__(self) -> str:
         """Name."""
         return self.text
+
+    def to_dict(self) -> dict[str, str | list[dict]]:
+        """Convert this model to a dictionary."""
+        return {
+            "text": self.text,
+            "language": self.language,
+            "attributes": [attribute.to_dict() for attribute in self.attributes.all()],
+        }
 
     class Meta:
         """Meta."""
