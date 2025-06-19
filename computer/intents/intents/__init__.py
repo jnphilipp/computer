@@ -24,8 +24,8 @@ from .time import general as time_general
 from .weather import general as weather_general
 
 
-def base(text, language, **kwargs) -> dict:
-    """Basic intent function."""
+def base(text: str, language: str, **kwargs) -> dict:
+    """Handle base logic for intent processing."""
     return {}
 
 
@@ -36,3 +36,17 @@ farewell_night = base
 greet = base
 greet_feelings = base
 thankyou = base
+
+__all__ = (
+    "date_holiday",
+    "date_general",
+    "time_general",
+    "weather_general",
+    "affirm",
+    "deny",
+    "farewell",
+    "farewell_night",
+    "greet",
+    "greet_feelings",
+    "thankyou",
+)

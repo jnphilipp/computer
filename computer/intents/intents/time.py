@@ -18,11 +18,10 @@
 # along with computer. If not, see <http://www.gnu.org/licenses/>
 """Intents Django app time intent."""
 
-from django.conf import settings
 from django.utils import formats, timezone
 
 
-def general(text, language, **kwargs) -> dict:
+def general(text: str, language: str, **kwargs) -> dict:
     """General time intent."""
     time = timezone.localtime()
     return {"time": formats.time_format(time, "TIME_FORMAT")}

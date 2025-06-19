@@ -32,7 +32,8 @@ def _api_call(endpoint: str, params: dict = {}) -> dict:
     )
     params["APPID"] = settings.APIS["WEATHER"]["APPID"]
 
-    r = requests.get(url, header=params)
+    r = requests.get(url, headers=params)
+    r.raise_for_status()
     return r.json()
 
 

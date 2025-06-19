@@ -19,21 +19,20 @@
 """Intents Django app date intens."""
 
 from datetime import datetime
-from django.conf import settings
 from django.utils import timezone
 from django.utils.dates import WEEKDAYS, MONTHS
 from texts.models import TriggerEntity
 
 
-def holiday(text, language, **kwargs) -> dict:
+def holiday(text: str, language: str, **kwargs) -> dict:
     """Holiday intent."""
     date = timezone.localtime().date()
 
-    christmas = False
-    new_years_eve = False
+    is_christmas = False
+    is_new_years_eve = False
     holiday = None
     for entity in TriggerEntity.objects.filter(entity__name="holiday").filter(
-        trigger__language__code=language
+        trigger__language=language
     ):
         if entity.value.lower() in text.lower():
             holiday = entity.value
@@ -46,7 +45,7 @@ def holiday(text, language, **kwargs) -> dict:
                 entity.value == "Silvester" or entity.value == "New Year's Eve"
             )
 
-    if christmas:
+    if is_christmas:
         christmas = datetime(date.year, 12, 24).date()
         days = (christmas - date).days
         if days == 0 or days == -1 or days == -2:
@@ -57,7 +56,7 @@ def holiday(text, language, **kwargs) -> dict:
             return {"days": -2, "holiday": holiday}
         else:
             return {"days": days, "holiday": holiday}
-    elif new_years_eve:
+    elif is_new_years_eve:
         new_years_eve = datetime(date.year, 12, 31).date()
         days = (new_years_eve - date).days
         if days == 0:
@@ -68,7 +67,7 @@ def holiday(text, language, **kwargs) -> dict:
         return {"holiday": holiday}
 
 
-def general(text, language, **kwargs) -> dict:
+def general(text: str, language: str, **kwargs) -> dict:
     """General date intent."""
     date = timezone.localtime()
     return {
