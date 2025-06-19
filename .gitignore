@@ -1,4 +1,18 @@
+# Python
 __pycache__
-.venv
+venv
+.mypy_cache
 *.pyc
-local.py
+
+# Django
+computer/local.py
+computer/db.sqlite3
+computer/media
+computer/static
+
+# SublimeText
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+Session.vim
