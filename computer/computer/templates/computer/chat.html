@@ -17,8 +17,8 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-md-1">
-            <div class="col-md-12 text-center">
+        <div class="row my-2 sticky-bottom">
+            <div class="col-12 text-center">
                 <textarea id="msg-input" class="form-control" placeholder="{% translate "Type a message" %}" style="resize: none; min-height: 2em; overflow: hidden;"></textarea>
             </div>
         </div>
@@ -38,7 +38,7 @@
             var text = $("#msg-input").val();
             $("#msg-input").val("");
             $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-end\"><p class=\"balon-r\">" + text + "</p></div></div>");
-            $("#history").scrollTop($("#history")[0].scrollHeight);
+            $("html, body").animate({scrollTop: $(document).height()}, "slow");
 
             var data = {"text": text};
             if ( latitude !== undefined && longitude !== undefined ) {
@@ -51,9 +51,9 @@
             $.post("/api/v1/nlu/", data, function(data) {
                 last_intent = data.intent;
                 data.replies.forEach(function(reply) {
-                    $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-start\"><p class=\"balon-l\">" + reply + "</p></div></div>");
+                    $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-start\"><p class=\"balon-l" + (last_intent == "error" ? " error" : "") + "\">" + reply + "</p></div></div>");
                 }, "json");
-                $("#history").scrollTop($("#history")[0].scrollHeight);
+                $("html, body").animate({scrollTop: $(document).height()}, "slow");
             });
         }
     });

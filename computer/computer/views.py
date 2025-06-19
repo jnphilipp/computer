@@ -24,6 +24,7 @@ import numpy as np
 from django.db.models import Count
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.utils import timezone, translation
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from intents import intents
 from profiles.models import NLURequest
@@ -56,58 +57,71 @@ def nlu(request):
     else:
         return HttpResponseBadRequest('The parameter "text" was not given.')
 
-    model = NLUModel()
-    outs = model.predict(text)
+    try:
+        model = NLUModel()
+        outs = model.predict(text)
 
-    translation.activate(outs["language"]["name"])
-    request.LANGUAGE_CODE = translation.get_language()
+        translation.activate(outs["language"]["name"])
+        request.LANGUAGE_CODE = translation.get_language()
 
-    nlu_request.nlu_model_output = outs
-    nlu_request.save()
+        nlu_request.nlu_model_output = outs
+        nlu_request.save()
 
-    fn = getattr(intents, outs["intent"]["name"])
-    properties = fn(
-        text=text,
-        language=outs["language"]["name"],
-        user_agent=request.headers.get("User-Agent"),
-        **outs["entities"]
-    )
-    nlu_request.intent_output = properties
-    nlu_request.save()
+        fn = getattr(intents, outs["intent"]["name"])
+        properties = fn(
+            text=text,
+            language=outs["language"]["name"],
+            user_agent=request.headers.get("User-Agent"),
+            **outs["entities"]
+        )
+        nlu_request.intent_output = properties
+        nlu_request.save()
 
-    attributes = []
-    for k, v in properties.items():
-        attrs = Attribute.objects.filter(key=k)
-        if attrs.count() > 1:
-            if attrs.filter(value=v).exists():
-                attributes.append(attrs.filter(value=v)[0].pk)
-            else:
-                attributes.append(attrs.filter(value=None)[0].pk)
-        elif attrs.count() == 1:
-            attributes.append(attrs[0].pk)
+        attributes = []
+        for k, v in properties.items():
+            attrs = Attribute.objects.filter(key=k)
+            if attrs.count() > 1:
+                if attrs.filter(value=v).exists():
+                    attributes.append(attrs.filter(value=v)[0].pk)
+                else:
+                    attributes.append(attrs.filter(value=None)[0].pk)
+            elif attrs.count() == 1:
+                attributes.append(attrs[0].pk)
 
-    answer = Answer.objects.annotate(num_attrs=Count("attributes")).filter(
-        intents__name=outs["intent"]["name"],
-        num_attrs=len(attributes),
-        language__code=outs["language"]["name"],
-    )
-    for attribute in attributes:
-        answer = answer.filter(attributes__id=attribute)
+        answer = Answer.objects.annotate(num_attrs=Count("attributes")).filter(
+            intents__name=outs["intent"]["name"],
+            num_attrs=len(attributes),
+            language=outs["language"]["name"],
+        )
+        for attribute in attributes:
+            answer = answer.filter(attributes__id=attribute)
 
-    if answer.count() >= 1:
-        answer = np.random.choice(answer)
-    else:
-        answer = Answer.objects.filter(
-            intents__name="fallback", language__code=request.LANGUAGE_CODE
-        ).order_by("?")[:1][0]
+        if answer.count() >= 1:
+            answer = np.random.choice(answer)
+        else:
+            answer = Answer.objects.filter(
+                intents__name="fallback", language=request.LANGUAGE_CODE
+            ).order_by("?")[:1][0]
 
-    nlu_request.answer = answer.text % properties
-    nlu_request.save()
-    return JsonResponse(
-        {
-            "response_date": timezone.now().strftime("%Y-%m-%dT%H:%M:%S:%f%z"),
-            "intent": outs["intent"]["name"],
-            "certainty": outs["intent"]["p"],
-            "replies": [answer.text % properties],
-        }
-    )
+        nlu_request.answer = answer.text % properties
+        nlu_request.save()
+        return JsonResponse(
+            {
+                "response_date": timezone.now().strftime("%Y-%m-%dT%H:%M:%S:%f%z"),
+                "intent": outs["intent"]["name"],
+                "certainty": outs["intent"]["p"],
+                "replies": [answer.text % properties],
+            }
+        )
+    except Exception as e:
+        text = _("An error occured while processing your request.")
+        nlu_request.answer = text + " " + str(e)
+        nlu_request.save()
+        return JsonResponse(
+            {
+                "response_date": timezone.now().strftime("%Y-%m-%dT%H:%M:%S:%f%z"),
+                "intent": "error",
+                "certainty": 1.0,
+                "replies": [text, str(e)],
+            }
+        )

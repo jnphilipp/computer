@@ -47,6 +47,11 @@ textarea {
     padding: 7px 13px 7px 13px;
 }
 
+.error {
+    background: #dc3545;
+    color: #ffffff !important;
+}
+
 .balon-r {
     background: #42a5f5;
     color: #fff !important;

@@ -48,8 +48,12 @@ class NLUModel(metaclass=Singleton):
             encoding="utf-8",
         ) as f:
             self.mappings = json.loads(f.read())
-            v = dict((s, str(i)) for i, s in enumerate(self.mappings["vocab"]))
-            self.trans = str.maketrans(v)
+            self.mappings["rintents"] = {}
+            for k, v in self.mappings["intents"].items():
+                self.mappings["rintents"][v] = k
+            self.mappings["rlanguages"] = {}
+            for k, v in self.mappings["languages"].items():
+                self.mappings["rlanguages"][v] = k
 
         try:
             print(
@@ -71,22 +75,23 @@ class NLUModel(metaclass=Singleton):
     def predict(self, text):
         """Predict intent."""
         text = self._clean_text(text)
-        X = np.asarray([int(s.translate(self.trans)) for s in "%s^" % text]).reshape(
-            (1, len(text) + 1)
-        )
-        outs = self.model.predict(X, batch_size=1)
+        x_text = np.asarray(
+            [self.mappings["vocab"]["<begin of sequence>"]]
+            + [
+                (
+                    self.mappings["vocab"][s]
+                    if s in self.mappings["vocab"]
+                    else self.mappings["vocab"]["<fallback character>"]
+                )
+                for s in text
+            ]
+            + [self.mappings["vocab"]["<end of sequence>"]]
+        ).reshape((1, len(text) + 2))
+        outs = self.model.predict({"text": x_text}, batch_size=1)
         p = {"entities": {}}
-        for i in range(len(outs)):
-            out = outs[i][0].argmax()
-
-            name = self.mappings["outputs"]["outputs"][i]
-            if name in self.mappings["outputs"]:
-                p[name] = {
-                    "name": self.mappings["outputs"][name][out],
-                    "p": float(outs[i][0][out]),
-                }
-            elif name in self.mappings["outputs"]["entities"]:
-                p["entities"]["name"] = float(outs[i][0][out])
-            else:
-                p[name] = float(outs[i][0][out])
+        for k, v in outs.items():
+            p[k] = {
+                "name": self.mappings["r" + k + "s"][v.argmax()],
+                "p": float(v.max()),
+            }
         return p
