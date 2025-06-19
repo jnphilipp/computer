@@ -155,7 +155,10 @@ class NLURequest(models.Model):
 
     def __str__(self) -> str:
         """Name."""
-        return f"{self.user.get_short_name()} {self.updated_at}"
+        return (
+            f"{self.user.get_short_name() if self.user else 'Anonymous'} "
+            + "{self.updated_at}"
+        )
 
     class Meta:
         """Meta."""

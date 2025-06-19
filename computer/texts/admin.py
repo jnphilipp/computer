@@ -47,28 +47,13 @@ class AnswerAdmin(admin.ModelAdmin):
         """Intents count."""
         return inst.intents_count
 
-    # def save_model(self, request, obj, form, change):
-    #     super(AnswerAdmin, self).save_model(request, obj, form, change)
-    #     obj.intents.clear()
-    #     for intent in form.cleaned_data['intents']:
-    #          obj.intents.add(intent)
-
-    # def get_form(self, request, obj=None, **kwargs):
-    #     ids = []
-    #     if obj:
-    #         ids = [o.pk for o in obj.intents.all()]
-    #     self.form.base_fields['intents'].initial = ids
-    #     return super(AnswerAdmin, self).get_form(request, obj, **kwargs)
-
     fieldsets = [
         (None, {"fields": ["text", "language"]}),
         (_("Attributes"), {"fields": ["attributes"]}),
-        (_("Intents"), {"fields": ["intents"]}),
     ]
     filter_horizontal = ("attributes",)
-    # form = AnswerForm
     list_display = ("text", "language", "attributes_count", "intents_count")
-    list_filter = ("language", "attributes", "intents")
+    list_filter = ("language", "attributes")
     ordering = ("text",)
     search_fields = ("text",)
 
@@ -91,7 +76,7 @@ class EntityAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         """Get queryset."""
-        return Answer.objects.annotate(
+        return Entity.objects.annotate(
             triggers_count=Count("triggers", distinct=True),
         )
 
@@ -138,6 +123,6 @@ class TriggerAdmin(admin.ModelAdmin):
     ]
     inlines = (TriggerEntityInline,)
     list_display = ("text", "language", "intent", "entities_count")
-    list_filter = ("language", "intent")
+    list_filter = ("intent", "language")
     ordering = ("text",)
     search_fields = ("text", "language")
