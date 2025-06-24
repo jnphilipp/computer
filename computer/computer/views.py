@@ -26,6 +26,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAll
 from django.utils import timezone, translation
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
+from django_markdowns.templatetags.markdowns import md
 from intents import intents
 from profiles.models import NLURequest
 from texts.models import Answer, Attribute
@@ -34,8 +35,30 @@ from .nlu_models import NLUModel
 
 
 @csrf_exempt
+def markdown(request):
+    """Handels GET/POST request for markdown.
+
+    GET/POST parameters:
+        text: the text to process
+    """
+    if request.method not in ["GET", "POST"]:
+        return HttpResponseNotAllowed(["GET", "POST"])
+
+    params = request.POST.copy() if request.method == "POST" else request.GET.copy()
+    if "application/json" == request.META.get("CONTENT_TYPE"):
+        params.update(json.loads(request.body.decode("utf-8")))
+
+    if "text" in params:
+        text = params.pop("text")[0].lower()
+    else:
+        return HttpResponseBadRequest('The parameter "text" was not given.')
+
+    return JsonResponse({"text": md(text)})
+
+
+@csrf_exempt
 def nlu(request):
-    """Handels GET/POST request for nlu.
+    """Handels POST request for nlu.
 
     POST parameters:
         text: the text to do the nlu for
@@ -110,7 +133,7 @@ def nlu(request):
                 "response_date": timezone.now().strftime("%Y-%m-%dT%H:%M:%S:%f%z"),
                 "intent": outs["intent"]["name"],
                 "certainty": outs["intent"]["p"],
-                "replies": [answer.text % properties],
+                "replies": [md(answer.text % properties)],
             }
         )
     except Exception as e:

@@ -31,8 +31,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 import sys
 
-from pathlib import Path
 from importlib.util import module_from_spec, spec_from_file_location
+from mdx_math import MathExtension
+from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -178,6 +179,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Markdowns
+
+MARKDOWNS = {
+    "IMG_CLASS": "img-fluid rounded",
+    "CUSTOM_EXTENSIONS": [MathExtension(enable_dollar_delimiter=True)],
+}
 
 
 # Keras models

@@ -43,7 +43,6 @@ textarea {
     background: #f1f1f1;
     color: #000 !important;
     border-radius: 20px 20px 20px 3px;
-    display: block;
     padding: 7px 13px 7px 13px;
 }
 
@@ -58,4 +57,8 @@ textarea {
     border-radius: 20px 20px 3px 20px;
     display: block;
     padding: 7px 13px 7px 13px;
+}
+
+.balon-l p, .balon-r p {
+    margin: 5px;
 }

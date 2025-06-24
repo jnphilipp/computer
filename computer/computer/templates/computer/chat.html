@@ -11,7 +11,7 @@
 
                     <div class="list-group-item border-0 flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-start">
-                            <p class="balon-l">{% translate "Hallo, wie kann ich behilflich sein?" %}</p>
+                            <div class="balon-l"><p>{% translate "Hallo, wie kann ich behilflich sein?" %}</p></div>
                         </div>
                     </div>
                 </div>
@@ -36,11 +36,15 @@
             var today = new Date();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
             var text = $("#msg-input").val();
-            $("#msg-input").val("");
-            $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-end\"><p class=\"balon-r\">" + text + "</p></div></div>");
-            $("html, body").animate({scrollTop: $(document).height()}, "slow");
-
             var data = {"text": text};
+            $("#msg-input").val("");
+
+            $.post("{% url "api:markdown" %}", data, function(data) {
+                $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-end\"><div class=\"balon-r\">" + data["text"] + "</div></div></div>");
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "history"]);
+                $("html, body").animate({scrollTop: $(document).height()}, "slow");
+            });
+
             if ( latitude !== undefined && longitude !== undefined ) {
                 data.latitude = latitude;
                 data.longitude = longitude;
@@ -51,8 +55,9 @@
             $.post("/api/v1/nlu/", data, function(data) {
                 last_intent = data.intent;
                 data.replies.forEach(function(reply) {
-                    $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-start\"><p class=\"balon-l" + (last_intent == "error" ? " error" : "") + "\">" + reply + "</p></div></div>");
+                    $("#history").append("<div class=\"list-group-item border-0 flex-column align-items-start\"><div class=\"d-flex w-100 justify-content-start\"><div class=\"balon-l" + (last_intent == "error" ? " error" : "") + "\">" + reply + "</div></div></div>");
                 }, "json");
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "history"]);
                 $("html, body").animate({scrollTop: $(document).height()}, "slow");
             });
         }

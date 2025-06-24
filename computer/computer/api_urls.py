@@ -25,5 +25,6 @@ from . import views
 
 app_name = "api"
 urlpatterns = [
-    path("v1/nlu/", views.nlu),
+    path("v1/nlu/", views.nlu, name="nlu"),
+    path("v1/markdown/", views.markdown, name="markdown"),
 ]

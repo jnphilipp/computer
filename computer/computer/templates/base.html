@@ -10,6 +10,14 @@
         {% django_html_utils_css %}
         {% django_html_utils_js %}
         <link rel="stylesheet" media="all" href="{% static "css/computer.css" %}"/>
+        <script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"></script>
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                config: ["MMLorHTML.js"],
+                jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
+                extensions: ["MathMenu.js", "MathZoom.js"]
+            });
+        </script>
         <title>{% block title %}computer{% endblock %}</title>
         {% block extrahead %}{% endblock %}
     </head>
