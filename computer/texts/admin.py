@@ -53,7 +53,7 @@ class AnswerAdmin(admin.ModelAdmin):
     ]
     filter_horizontal = ("attributes",)
     list_display = ("text", "language", "attributes_count", "intents_count")
-    list_filter = ("language", "attributes")
+    list_filter = ("intents", "attributes", "language")
     ordering = ("text",)
     search_fields = ("text",)
 
