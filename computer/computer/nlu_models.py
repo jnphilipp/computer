@@ -21,6 +21,7 @@
 
 import json
 import numpy as np
+import numpy.typing as npt
 import re
 import sys
 
@@ -54,16 +55,34 @@ class NLUModel(metaclass=Singleton):
             self.mappings["rlanguages"] = {}
             for k, v in self.mappings["languages"].items():
                 self.mappings["rlanguages"][v] = k
+            self.mappings["rvocab"] = {}
+            for k, v in self.mappings["vocab"].items():
+                self.mappings["rvocab"][v] = k
 
         try:
             print(
                 _('Loading model "%(path)s".')
                 % {"path": settings.MODELS["nlu"]["path"]}
             )
-            self.model = load_model(settings.BASE_DIR / settings.MODELS["nlu"]["path"])
+            self.nlu_model = load_model(
+                settings.BASE_DIR / settings.MODELS["nlu"]["path"]
+            )
         except Exception as e:
             print(_("Could not load model."), e, file=sys.stderr)
-            self.model = None
+            self.nlu_model = None
+
+        self.chat_model = None
+        if "chat" in settings.MODELS:
+            try:
+                print(
+                    _('Loading model "%(path)s".')
+                    % {"path": settings.MODELS["chat"]["path"]}
+                )
+                self.chat_model = load_model(
+                    settings.BASE_DIR / settings.MODELS["chat"]["path"]
+                )
+            except Exception as e:
+                print(_("Could not load model."), e, file=sys.stderr)
 
     def _clean_text(self, text):
         return re.sub(
@@ -72,22 +91,27 @@ class NLUModel(metaclass=Singleton):
             re.sub(r"\s\s+", " ", text),
         )
 
+    def _text_to_np(
+        self, text: str, include_end_of_sequence: bool = True
+    ) -> npt.NDArray:
+        x_text = np.zeros((1, self.mappings["context_size"]))
+        x_text[0, 0] = self.mappings["vocab"]["<begin of sequence>"]
+        i = 0
+        for i, s in enumerate(text):
+            x_text[0, i + 1] = (
+                self.mappings["vocab"][s]
+                if s in self.mappings["vocab"]
+                else self.mappings["vocab"]["<fallback character>"]
+            )
+        if include_end_of_sequence:
+            x_text[0, i + 2] = self.mappings["vocab"]["<end of sequence>"]
+        return x_text
+
     def predict(self, text):
         """Predict intent."""
         text = self._clean_text(text)
-        x_text = np.asarray(
-            [self.mappings["vocab"]["<begin of sequence>"]]
-            + [
-                (
-                    self.mappings["vocab"][s]
-                    if s in self.mappings["vocab"]
-                    else self.mappings["vocab"]["<fallback character>"]
-                )
-                for s in text
-            ]
-            + [self.mappings["vocab"]["<end of sequence>"]]
-        ).reshape((1, len(text) + 2))
-        outs = self.model.predict({"text": x_text}, batch_size=1)
+        x_text = self._text_to_np(text)
+        outs = self.nlu_model.predict({"text": x_text}, batch_size=1)
         p = {"entities": {}}
         for k, v in outs.items():
             p[k] = {
@@ -95,3 +119,24 @@ class NLUModel(metaclass=Singleton):
                 "p": float(v.max()),
             }
         return p
+
+    def chat(self, text: str, context: str | None = None) -> str:
+        """Generate text."""
+        text = self._clean_text(text)
+        x_text = self._text_to_np(text + ("" if context is None else context), False)
+        outs = self.chat_model.predict({"text": x_text}, batch_size=1)
+        answer_text = [] if context is None else list()
+        done = False
+        for i in range(len(text) + 1, len(outs["next"][0])):
+            if (
+                outs["next"][0][i].argmax()
+                == self.mappings["vocab"]["<end of sequence>"]
+            ):
+                done = True
+                break
+            answer_text.append(self.mappings["rvocab"][outs["next"][0][i].argmax()])
+
+        if done or len(answer_text) >= 98:
+            return "".join(answer_text)
+        else:
+            return self.chat(text, "".join(answer_text))
